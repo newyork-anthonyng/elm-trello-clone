@@ -1,6 +1,7 @@
 module Main exposing (..)
 
-import Html exposing (Html, div, text, program)
+import Html exposing (Html, div, text, ul, li, program)
+import List exposing (..)
 
 -- Main
 main : Program Never Model Msg
@@ -14,11 +15,21 @@ main =
 
 -- MODEL
 type alias Model =
-  String
+  { cards : List Card
+  }
+
+type alias Card =
+  { text: String
+  }
+
+initialModel : Model
+initialModel =
+  { cards = [ Card "Hi", Card "Bye" ]
+  }
 
 init : (Model, Cmd Msg)
 init =
-  ("Hello", Cmd.none)
+  (initialModel, Cmd.none)
 
 -- MESSAGES
 type Msg
@@ -35,7 +46,14 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div []
-    [ text model ]
+    [ ul []
+      (map test model.cards)
+    ]
+
+test : Card -> Html Msg
+test card =
+  li []
+    [ text card.text ]
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
