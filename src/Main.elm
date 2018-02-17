@@ -47,6 +47,7 @@ type Msg
   | EditCardListTitle Int
   | CancelEditCardListTitle Int
   | UpdateCardListTitle Int String
+  | SaveCardListTitle Int
 
 -- UPDATE
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -75,7 +76,13 @@ update msg model =
       let
         newCardList = List.map (updateEditFieldText id newInput) model.cardLists
       in
-          ({ model | cardLists = newCardList }, Cmd.none)
+        ({ model | cardLists = newCardList }, Cmd.none)
+
+    SaveCardListTitle id -> 
+      let
+        newCardList = List.map (saveCardListTitle id) model.cardLists
+      in
+        ({ model | cardLists = newCardList }, Cmd.none)
 
     NoOp ->
       (model, Cmd.none)
@@ -101,6 +108,18 @@ updateEditFieldText id newInputValue cardList =
     { cardList | inputValue = newInputValue }
   else
     cardList
+
+saveCardListTitle : Int -> CardList -> CardList
+saveCardListTitle id cardList =
+  if cardList.id == id then
+    { cardList
+    | title = cardList.inputValue
+    , inputValue = ""
+    , isEditing = False
+    }
+  else
+    cardList
+
 
 -- VIEW
 view : Model -> Html Msg
@@ -129,6 +148,7 @@ renderList cardList =
                 , onInput (UpdateCardListTitle cardList.id)
                 ]
                 []
+              , button [ onClick (SaveCardListTitle cardList.id) ] [ text "Save" ]
               , button [ onClick (CancelEditCardListTitle cardList.id) ] [ text "Cancel" ]
               ]
           else
