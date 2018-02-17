@@ -21,15 +21,16 @@ type alias Model =
   }
 
 type alias CardList =
-  { title : String
+  { id: Int
+  , title : String
   , isEditing : Bool
   }
 
 initialModel : Model
 initialModel =
   { cardLists =
-    [ CardList "First" True
-    , CardList "Second" False
+    [ CardList 0 "First" True
+    , CardList 1 "Second" False
     ]
   }
 
@@ -42,6 +43,7 @@ init =
 type Msg
   = NoOp
   | HandleClick
+  | EditCardListTitle Int
 
 -- UPDATE
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -49,11 +51,27 @@ update msg model =
   case msg of
     HandleClick ->
       let
-        newCardList = List.append model.cardLists [CardList "New list" False]
+        newIndex = List.length model.cardLists
+        newCardList = List.append model.cardLists [CardList newIndex "New list" False]
       in
         ({ model | cardLists = newCardList }, Cmd.none)
+
+    EditCardListTitle id ->
+      let
+        newCardList = List.map (updateEditField id) model.cardLists
+      in
+        ({ model | cardLists = newCardList }, Cmd.none)
+
     NoOp ->
       (model, Cmd.none)
+
+updateEditField : Int -> CardList -> CardList
+updateEditField id cardList =
+  if cardList.id == id then
+    { cardList | isEditing = True }
+  else
+    cardList
+
 
 -- VIEW
 view : Model -> Html Msg
@@ -72,8 +90,13 @@ renderList : CardList -> Html Msg
 renderList cardList =
   ul []
     [ li []
-      [ span [ style [ ("color", if cardList.isEditing then "red" else "blue") ] ]
-        [ text cardList.title ]
+      [ span []
+        [
+          if cardList.isEditing then
+            input [ placeholder "Hello" ] []
+          else
+            span [ onClick (EditCardListTitle cardList.id) ] [ text cardList.title ]
+        ]
       ]
     ]
 
