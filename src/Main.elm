@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import List
 
 -- Main
@@ -24,13 +24,14 @@ type alias CardList =
   { id: Int
   , title : String
   , isEditing : Bool
+  , inputValue : String
   }
 
 initialModel : Model
 initialModel =
   { cardLists =
-    [ CardList 0 "First" True
-    , CardList 1 "Second" False
+    [ CardList 0 "First" True ""
+    , CardList 1 "Second" False ""
     ]
   }
 
@@ -45,6 +46,7 @@ type Msg
   | HandleClick
   | EditCardListTitle Int
   | CancelEditCardListTitle Int
+  | UpdateCardListTitle Int String
 
 -- UPDATE
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -53,7 +55,7 @@ update msg model =
     HandleClick ->
       let
         newIndex = List.length model.cardLists
-        newCardList = List.append model.cardLists [CardList newIndex "New list" False]
+        newCardList = List.append model.cardLists [CardList newIndex "New list" False ""]
       in
         ({ model | cardLists = newCardList }, Cmd.none)
 
@@ -69,6 +71,11 @@ update msg model =
       in
         ({ model | cardLists = newCardList }, Cmd.none)
 
+    UpdateCardListTitle id newInput ->
+      let
+        newCardList = List.map (updateEditFieldText id newInput) model.cardLists
+      in
+          ({ model | cardLists = newCardList }, Cmd.none)
 
     NoOp ->
       (model, Cmd.none)
@@ -88,11 +95,18 @@ updateEditField isEditing id cardList =
   else
     cardList
 
+updateEditFieldText : Int -> String -> CardList -> CardList
+updateEditFieldText id newInputValue cardList =
+  if cardList.id == id then
+    { cardList | inputValue = newInputValue }
+  else
+    cardList
+
 -- VIEW
 view : Model -> Html Msg
 view model =
   div []
-    [ h1 [] [ text "Yo" ]
+    [ h1 [] [ text "Trello Clone" ]
     , button [ onClick HandleClick ] [ text "Add" ]
     , div [] (renderLists model.cardLists)
     ]
@@ -109,7 +123,12 @@ renderList cardList =
         [
           if cardList.isEditing then
             div []
-              [ input [ placeholder "Hello" ] []
+              [ input
+                [ placeholder "Change card title name"
+                , value (getListInputValue cardList)
+                , onInput (UpdateCardListTitle cardList.id)
+                ]
+                []
               , button [ onClick (CancelEditCardListTitle cardList.id) ] [ text "Cancel" ]
               ]
           else
@@ -117,6 +136,13 @@ renderList cardList =
         ]
       ]
     ]
+
+getListInputValue : CardList -> String
+getListInputValue cardList =
+  if cardList.inputValue == "" then
+    cardList.title
+  else
+    cardList.inputValue
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
