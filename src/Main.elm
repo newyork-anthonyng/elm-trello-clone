@@ -15,7 +15,12 @@ main =
 
 -- MODEL
 type alias Model =
-  { cards : List Card
+  { cardLists : List CardList
+  }
+
+type alias CardList =
+  { name: String,
+    cards: List Card
   }
 
 type alias Card =
@@ -24,7 +29,7 @@ type alias Card =
 
 initialModel : Model
 initialModel =
-  { cards = [ Card "Hi", Card "Bye" ]
+  { cardLists = [ CardList "First" [ Card "Hi" ], CardList "Second" [ Card "bye" ]]
   }
 
 init : (Model, Cmd Msg)
@@ -46,12 +51,18 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div []
-    [ ul []
-      (map test model.cards)
-    ]
+    (map createCardList model.cardLists)
 
-test : Card -> Html Msg
-test card =
+
+createCardList : CardList -> Html Msg
+createCardList cardList =
+  ul []
+    (concat [ [text cardList.name]
+            , map createCard cardList.cards
+    ])
+
+createCard : Card -> Html Msg
+createCard card =
   li []
     [ text card.text ]
 
