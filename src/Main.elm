@@ -75,15 +75,16 @@ update msg model =
 
 openEditField : Int -> CardList -> CardList
 openEditField id cardList =
-  if cardList.id == id then
-    { cardList | isEditing = True }
-  else
-    cardList
+  updateEditField True id cardList
 
 closeEditField : Int -> CardList -> CardList
 closeEditField id cardList =
+  updateEditField False id cardList
+
+updateEditField : Bool -> Int -> CardList -> CardList
+updateEditField isEditing id cardList =
   if cardList.id == id then
-    { cardList | isEditing = False }
+    { cardList | isEditing = isEditing }
   else
     cardList
 
