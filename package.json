@@ -1,0 +1,23 @@
+{
+  "name": "elm-trello-clone",
+  "version": "1.0.0",
+  "description": "This is a practice project. I'm building a Trello clone with Elm.",
+  "main": "webpack.config.js",
+  "dependencies": {
+    "css-loader": "^0.28.9",
+    "elm-webpack-loader": "^4.4.0",
+    "file-loader": "^1.1.6",
+    "style-loader": "^0.20.2",
+    "url-loader": "^0.6.2",
+    "webpack": "^3.11.0",
+    "webpack-dev-server": "^2.11.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack && webpack-dev-server --port 3000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
