@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Events exposing (onClick)
+import List
 
 -- Main
 main : Program Never Model Msg
@@ -14,11 +15,17 @@ main =
     }
 
 -- MODEL
-type alias Model = String
+type alias Model =
+  {  cardLists : List CardList
+  }
+
+type alias CardList =
+  { title : String
+  }
 
 init : (Model, Cmd Msg)
 init =
-  ("Hi", Cmd.none)
+  ({ cardLists = [] }, Cmd.none)
 
 -- MESSAGES
 type Msg
@@ -30,7 +37,10 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     HandleClick ->
-      (model ++ "i", Cmd.none)
+      let
+        newCardList = List.append model.cardLists [CardList "New list"]
+      in
+        ({ model | cardLists = newCardList }, Cmd.none)
     NoOp ->
       (model, Cmd.none)
 
@@ -38,8 +48,19 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div []
-    [ h1 [] [ text model ]
+    [ h1 [] [ text "Yo" ]
     , button [ onClick HandleClick ] [ text "Add" ]
+    , div [] (renderLists model.cardLists)
+    ]
+
+renderLists : List CardList -> List (Html Msg)
+renderLists cardLists =
+  List.map renderList cardLists
+
+renderList : CardList -> Html Msg
+renderList cardList =
+  ul []
+    [ li [] [ text cardList.title ]
     ]
 
 -- SUBSCRIPTIONS
