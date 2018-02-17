@@ -44,6 +44,7 @@ type Msg
   = NoOp
   | HandleClick
   | EditCardListTitle Int
+  | CancelEditCardListTitle Int
 
 -- UPDATE
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -58,20 +59,33 @@ update msg model =
 
     EditCardListTitle id ->
       let
-        newCardList = List.map (updateEditField id) model.cardLists
+        newCardList = List.map (openEditField id) model.cardLists
       in
         ({ model | cardLists = newCardList }, Cmd.none)
+
+    CancelEditCardListTitle id ->
+      let
+        newCardList = List.map (closeEditField id) model.cardLists
+      in
+        ({ model | cardLists = newCardList }, Cmd.none)
+
 
     NoOp ->
       (model, Cmd.none)
 
-updateEditField : Int -> CardList -> CardList
-updateEditField id cardList =
+openEditField : Int -> CardList -> CardList
+openEditField id cardList =
   if cardList.id == id then
     { cardList | isEditing = True }
   else
     cardList
 
+closeEditField : Int -> CardList -> CardList
+closeEditField id cardList =
+  if cardList.id == id then
+    { cardList | isEditing = False }
+  else
+    cardList
 
 -- VIEW
 view : Model -> Html Msg
@@ -93,7 +107,10 @@ renderList cardList =
       [ span []
         [
           if cardList.isEditing then
-            input [ placeholder "Hello" ] []
+            div []
+              [ input [ placeholder "Hello" ] []
+              , button [ onClick (CancelEditCardListTitle cardList.id) ] [ text "Cancel" ]
+              ]
           else
             span [ onClick (EditCardListTitle cardList.id) ] [ text cardList.title ]
         ]
