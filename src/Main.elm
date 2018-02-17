@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import List
 
@@ -21,11 +22,21 @@ type alias Model =
 
 type alias CardList =
   { title : String
+  , isEditing : Bool
   }
+
+initialModel : Model
+initialModel =
+  { cardLists =
+    [ CardList "First" True
+    , CardList "Second" False
+    ]
+  }
+
 
 init : (Model, Cmd Msg)
 init =
-  ({ cardLists = [] }, Cmd.none)
+  (initialModel, Cmd.none)
 
 -- MESSAGES
 type Msg
@@ -38,7 +49,7 @@ update msg model =
   case msg of
     HandleClick ->
       let
-        newCardList = List.append model.cardLists [CardList "New list"]
+        newCardList = List.append model.cardLists [CardList "New list" False]
       in
         ({ model | cardLists = newCardList }, Cmd.none)
     NoOp ->
@@ -60,7 +71,10 @@ renderLists cardLists =
 renderList : CardList -> Html Msg
 renderList cardList =
   ul []
-    [ li [] [ text cardList.title ]
+    [ li []
+      [ span [ style [ ("color", if cardList.isEditing then "red" else "blue") ] ]
+        [ text cardList.title ]
+      ]
     ]
 
 -- SUBSCRIPTIONS
