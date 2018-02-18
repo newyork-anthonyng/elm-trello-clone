@@ -10,7 +10,7 @@ update msg model =
     HandleClick ->
       let
         newIndex = List.length model.cardLists
-        newCardList = List.append model.cardLists [CardList newIndex "New list" False ""]
+        newCardList = List.append model.cardLists [CardList newIndex "New list" False "" []]
       in
         ({ model | cardLists = newCardList }, Cmd.none)
 
@@ -37,6 +37,13 @@ update msg model =
         newCardList = List.map (saveCardListTitle id) model.cardLists
       in
         ({ model | cardLists = newCardList }, Cmd.none)
+
+    AddCard id ->
+      let
+        newCardList = List.map (addCardToList id) model.cardLists
+      in
+        ({ model | cardLists = newCardList }, Cmd.none)
+          
 
     NoOp ->
       (model, Cmd.none)
@@ -66,11 +73,30 @@ updateEditFieldText id newInputValue cardList =
 saveCardListTitle : Int -> CardList -> CardList
 saveCardListTitle id cardList =
   if cardList.id == id then
-    { cardList
-    | title = cardList.inputValue
-    , inputValue = ""
-    , isEditing = False
-    }
+    let
+      newInputValue =
+        if cardList.inputValue == "" then
+          cardList.title
+        else
+          cardList.inputValue
+    in    
+      { cardList
+      | title = newInputValue
+      , inputValue = ""
+      , isEditing = False
+      }
   else
     cardList
 
+addCardToList : Int -> CardList -> CardList
+addCardToList id cardList =
+  if cardList.id == id then
+    let
+      newId = List.length cardList.cards
+      newCard = Card newId "Yolo"    
+    in
+      { cardList
+      | cards = newCard :: cardList.cards
+      }  
+  else
+    cardList

@@ -8,3 +8,4 @@ type Msg
   | CancelEditCardListTitle Int
   | UpdateCardListTitle Int String
   | SaveCardListTitle Int
+  | AddCard Int
